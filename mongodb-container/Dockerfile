@@ -29,7 +29,7 @@ mv mongodb-linux-x86_64-ubuntu2004-${MONGODB_VERSION} ${MONGODB_HOME}
 
 COPY ./startmongod.sh ${MONGODB_BIN}/startmongod.sh
 
-VOLUME /var/lib/mysql
+VOLUME ${MONGODATA_PATH}
 
 EXPOSE 27017
 

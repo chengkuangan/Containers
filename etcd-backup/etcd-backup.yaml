@@ -62,7 +62,7 @@ metadata:
     app-group: etcd-backup
 spec:
   # Change the schedule here
-  schedule: "* 6 * * *"
+  schedule: "0 0 * * *"
   jobTemplate:
     spec:
       template:

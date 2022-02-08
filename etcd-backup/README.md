@@ -40,7 +40,7 @@ $ docker buildx build --build-arg KUBE_VERSION=v1.22.4 --build-arg ETCD_VERSION=
             app-group: etcd-backup
     spec:
         # Change the schedule here
-        schedule: "* 6 * * *"
+        schedule: "0 0 * * *"
         jobTemplate:
 
     ```

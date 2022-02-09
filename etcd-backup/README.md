@@ -61,7 +61,7 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
             app: etcd-backup
             app-group: etcd-backup
     spec:
-        # Change the schedule here
+        # Change the schedule here. This is with timezone set to UTC+0:00
         schedule: "0 0 * * *"
         jobTemplate:
     ...

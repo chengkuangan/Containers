@@ -76,4 +76,5 @@ function backup(){
     done
 }
 
+log "Timezone: ${TZ}"
 backup

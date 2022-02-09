@@ -22,7 +22,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
+  storageClassName: managed-nfs-storage-2
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
@@ -54,7 +54,7 @@ roleRef:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: ectd-backup
+  name: etcd-backup
   namespace: etcd-backup
   labels:
     app: etcd-backup
@@ -67,8 +67,12 @@ spec:
       template:
         spec:
           containers:
-          - name: ectd-backup
-            image: nexus.internal:7082/repository/containers/etcd-backup:alpine-arm64-1.0.0
+          - env:
+            - name: TZ
+              value: "Asia/Kuala_Lumpur"
+            name: ectd-backup
+            #image: chengkuan/etcd-backup:arm64-1.0.0
+            image: nexus.internal:7082/repository/containers/etcd-backup:arm64-1.0.0
             imagePullPolicy: Always
             resources:
               requests:

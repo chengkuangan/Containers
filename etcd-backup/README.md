@@ -8,26 +8,48 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
 
 ## Build the Container
 
-```
-# build for arm64 and push to registry
-$ docker buildx build --platform linux/arm64 -t chengkuan/etcd-backup:arm64-1.0.0 -f Dockerfile.alpine.arm64 --push .
+1. Build the base image
 
-# build for amd64 and push to registry
-$ docker buildx build --platform linux/amd64 -t chengkuan/etcd-backup:amd64-1.0.0 -f Dockerfile.alpine.amd64 --push .
+    The current `etcd` version is defaulted into "v3.5.0" in the [Dockerfile.alpine](./Dockerfile.alpine). 
+    You can change the etcd version to your preferred version using `--build-arg ETCD_VERSION=v3.5.0` at the `docker build` command.
 
-# push to internal insecured registry
-$ docker buildx build --platform linux/arm64 -t nexus.internal:7082/repository/containers/etcd-backup:arm64-1.0.0 -f Dockerfile.alpine.arm64 --push --output=type=registry,registry.insecure=true .
-docker buildx build --platform linux/amd64 -t nexus.internal:7082/repository/containers/etcd-backup:amd64-1.0.0 -f Dockerfile.alpine.amd64 --push --output=type=registry,registry.insecure=true .
+  ```
+  # Internal insecured registry
+  docker buildx build --platform linux/arm64,linux/amd64 -t nexus.internal:7082/repository/containers/etcd-backup-base:1.0.0  -f Dockerfile.alpine --push --output=type=registry,registry.insecure=true .
 
-# Specifiying a specific kubectl and etcd version
-$ docker buildx build --build-arg KUBE_VERSION=v1.22.4 --build-arg ETCD_VERSION=v3.5.0 --platform linux/arm64 -t nexus.internal:7082/repository/containers/etcd-backup:alpine-arm64-1.0.0 -f Dockerfile.alpine.arm64 --push --output=type=registry,registry.insecure=true .
-$ docker buildx build --build-arg KUBE_VERSION=v1.22.4 --build-arg ETCD_VERSION=v3.5.0 --platform linux/amd64 -t nexus.internal:7082/repository/containers/etcd-backup:alpine-amd64-1.0.0 -f Dockerfile.alpine.amd64 --push --output=type=registry,registry.insecure=true .
+  # Docker.io
+  docker buildx build --platform linux/arm64,linux/amd64 -t chengkuan/etcd-backup-base:1.0.0  -f Dockerfile.alpine --push .
+  ```
 
-```
+2. Build the arm64 base image
+
+    The current `kubectl` version is defaulted into "v1.22.4" in the [Dockerfile.alpine.arm64](./Dockerfile.alpine.arm64) file. 
+    You can change the etcd version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
+
+  ```
+  # Internal insecured registry
+  docker buildx build --platform linux/arm64 -t nexus.internal:7082/repository/containers/etcd-backup:arm64-1.0.0  -f Dockerfile.alpine.arm64 --push --output=type=registry,registry.insecure=true .
+
+  # Docker.io
+  docker buildx build --platform linux/arm64 -t chengkuan/etcd-backup:arm64-1.0.0  -f Dockerfile.alpine.arm64 --push .
+  ```
+
+3. Build the amd64 base image
+
+    The current `kubectl` version is defaulted into "v1.22.4" in the [Dockerfile.alpine.amd64](./Dockerfile.alpine.amd64) file. 
+    You can change the etcd version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
+
+  ```
+  # Internal insecured registry
+  docker buildx build --platform linux/amd64 -t nexus.internal:7082/repository/containers/etcd-backup:amd64-1.0.0  -f Dockerfile.alpine.amd64 --push --output=type=registry,registry.insecure=true .
+
+  # Docker.io
+  docker buildx build --platform linux/amd64 -t chengkuan/etcd-backup:amd64-1.0.0  -f Dockerfile.alpine.amd64 --push .
+  ```
 
 ## Deploy into Kubernetes
 
-1. Open [etcd-backup.yaml](./etcd-backup.yaml) and change the `Conjob` schedule to the schedule that you prefer. 
+1. Open [etcd-backup.yaml](./etcd-backup.yaml) and change the `Conjob` schedule to your preference. 
 
     ```yaml
     apiVersion: batch/v1
@@ -42,14 +64,49 @@ $ docker buildx build --build-arg KUBE_VERSION=v1.22.4 --build-arg ETCD_VERSION=
         # Change the schedule here
         schedule: "0 0 * * *"
         jobTemplate:
-
+    ...
     ```
     Refer the Kubernetes [Cronjob syntax](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax) for more configuration option.
+
+    
+
+2. Change the timezone via the YAML environmental variable. This affects the snapshot filename and the logging timestamp.
+    ```yaml
+          - env:
+            - name: TZ
+              value: "Asia/Kuala_Lumpur"
+    ```
+
+3. The YAML also defines the location for the `etcd` POD PKI certificates and key using a `Hostpath` definition. We also define the PVC to store the snapshot file. This is also the location for the log file.
+
+    ```
+          volumeMounts:
+            - mountPath: /etc/kubernetes/pki/etcd
+              name: etcd-certs
+              readOnly: true
+            - mountPath: /backup
+              name: snapshot-dir
+          restartPolicy: OnFailure
+          volumes:
+          - hostPath:
+              path: /etc/kubernetes/pki/etcd
+              type: Directory
+            name: etcd-certs
+          - name: snapshot-dir
+            persistentVolumeClaim:
+              claimName: etcd-backup-snapshot-pvc
+
+    ```
 
 2. Deploy the container to Kubernetes
 
     ```
     $ kubectl create -f etcd-backup.yaml
     ```
-    Note: This will create all the necessary ClusterRole, ClusterRoleBinding, PVC, namespaces and Pod. Make sure the required `PersistentVolume` are created if your Kubernetes cluster does not support `Dynamic Storage Class`.
+    Note: This will create all the necessary ClusterRole, ClusterRoleBinding, PVC, namespaces and Pod. Make sure the required [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistent-volumes) are created if your Kubernetes cluster does not support `Dynamic Storage Class`.
 
+3. To test the container
+
+    ```
+    kubectl create job testjob --from=cronjob/etcd-backup -n etcd-backup
+    ```

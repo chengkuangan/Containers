@@ -60,7 +60,7 @@ metadata:
     app: etcd-backup
     app-group: etcd-backup
 spec:
-  # Change the schedule here
+  # Change the schedule here. This is with timezone set to UTC+0:00
   schedule: "0 0 * * *"
   jobTemplate:
     spec:

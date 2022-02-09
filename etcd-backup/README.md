@@ -110,3 +110,49 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
     ```
     kubectl create job testjob --from=cronjob/etcd-backup -n etcd-backup
     ```
+
+    You will observe the output as per the following:
+    
+    ```
+    2022-02-09-12:58:46 PM   Timezone: Asia/Kuala_Lumpur
+    2022-02-09-12:58:47 PM   Startinng snapshot for etcd-kube0.internal ... 
+    2022-02-09-12:58:47 PM   ADVERTISED_CLIENT_URL = https://192.168.0.220:2379
+    2022-02-09-12:58:47 PM   ETCD_SERVER_CERT = /etc/kubernetes/pki/etcd/server.crt
+    2022-02-09-12:58:47 PM   ETCD_SERVER_KEY = /etc/kubernetes/pki/etcd/server.key
+    2022-02-09-12:58:47 PM   ETCD_CACERT = /etc/kubernetes/pki/etcd/ca.crt
+    2022-02-09-12:58:47 PM   Backing up etcd-kube0.internal ... Snapshot file: /backup/etcd-kube0.internal-2022-02-09-12-58-1644382727 ...
+    2022-02-09-12:58:48 PM   {"level":"info","ts":1644382728.0371673,"caller":"snapshot/v3_snapshot.go:68","msg":"created temporary db file","path":"/backup/etcd-kube0.internal-2022-02-09-12-58-1644382727.part"}
+    {"level":"info","ts":1644382728.0592608,"logger":"client","caller":"v3/maintenance.go:211","msg":"opened snapshot stream; downloading"}
+    {"level":"info","ts":1644382728.059408,"caller":"snapshot/v3_snapshot.go:76","msg":"fetching snapshot","endpoint":"https://192.168.0.220:2379"}
+    {"level":"info","ts":1644382728.6281931,"logger":"client","caller":"v3/maintenance.go:219","msg":"completed snapshot read; closing"}
+    {"level":"info","ts":1644382728.7922444,"caller":"snapshot/v3_snapshot.go:91","msg":"fetched snapshot","endpoint":"https://192.168.0.220:2379","size":"12 MB","took":"now"}
+    {"level":"info","ts":1644382728.8014007,"caller":"snapshot/v3_snapshot.go:100","msg":"saved","path":"/backup/etcd-kube0.internal-2022-02-09-12-58-1644382727"}
+    Snapshot saved at /backup/etcd-kube0.internal-2022-02-09-12-58-1644382727
+    2022-02-09-12:58:48 PM   Startinng snapshot for etcd-kube1.internal ... 
+    2022-02-09-12:58:49 PM   ADVERTISED_CLIENT_URL = https://192.168.0.221:2379
+    2022-02-09-12:58:49 PM   ETCD_SERVER_CERT = /etc/kubernetes/pki/etcd/server.crt
+    2022-02-09-12:58:49 PM   ETCD_SERVER_KEY = /etc/kubernetes/pki/etcd/server.key
+    2022-02-09-12:58:49 PM   ETCD_CACERT = /etc/kubernetes/pki/etcd/ca.crt
+    2022-02-09-12:58:49 PM   Backing up etcd-kube1.internal ... Snapshot file: /backup/etcd-kube1.internal-2022-02-09-12-58-1644382729 ...
+    2022-02-09-12:58:50 PM   {"level":"info","ts":1644382729.6139565,"caller":"snapshot/v3_snapshot.go:68","msg":"created temporary db file","path":"/backup/etcd-kube1.internal-2022-02-09-12-58-1644382729.part"}
+    {"level":"info","ts":1644382729.6572225,"logger":"client","caller":"v3/maintenance.go:211","msg":"opened snapshot stream; downloading"}
+    {"level":"info","ts":1644382729.6585956,"caller":"snapshot/v3_snapshot.go:76","msg":"fetching snapshot","endpoint":"https://192.168.0.221:2379"}
+    {"level":"info","ts":1644382730.1461122,"logger":"client","caller":"v3/maintenance.go:219","msg":"completed snapshot read; closing"}
+    {"level":"info","ts":1644382730.5825508,"caller":"snapshot/v3_snapshot.go:91","msg":"fetched snapshot","endpoint":"https://192.168.0.221:2379","size":"12 MB","took":"now"}
+    {"level":"info","ts":1644382730.6201115,"caller":"snapshot/v3_snapshot.go:100","msg":"saved","path":"/backup/etcd-kube1.internal-2022-02-09-12-58-1644382729"}
+    Snapshot saved at /backup/etcd-kube1.internal-2022-02-09-12-58-1644382729
+    2022-02-09-12:58:50 PM   Startinng snapshot for etcd-kube2.internal ... 
+    2022-02-09-12:58:50 PM   ADVERTISED_CLIENT_URL = https://192.168.0.222:2379
+    2022-02-09-12:58:51 PM   ETCD_SERVER_CERT = /etc/kubernetes/pki/etcd/server.crt
+    2022-02-09-12:58:51 PM   ETCD_SERVER_KEY = /etc/kubernetes/pki/etcd/server.key
+    2022-02-09-12:58:51 PM   ETCD_CACERT = /etc/kubernetes/pki/etcd/ca.crt
+    2022-02-09-12:58:51 PM   Backing up etcd-kube2.internal ... Snapshot file: /backup/etcd-kube2.internal-2022-02-09-12-58-1644382731 ...
+    2022-02-09-12:58:52 PM   {"level":"info","ts":1644382731.4680276,"caller":"snapshot/v3_snapshot.go:68","msg":"created temporary db file","path":"/backup/etcd-kube2.internal-2022-02-09-12-58-1644382731.part"}
+    {"level":"info","ts":1644382731.4753816,"logger":"client","caller":"v3/maintenance.go:211","msg":"opened snapshot stream; downloading"}
+    {"level":"info","ts":1644382731.475609,"caller":"snapshot/v3_snapshot.go:76","msg":"fetching snapshot","endpoint":"https://192.168.0.222:2379"}
+    {"level":"info","ts":1644382732.0035121,"logger":"client","caller":"v3/maintenance.go:219","msg":"completed snapshot read; closing"}
+    {"level":"info","ts":1644382732.3840053,"caller":"snapshot/v3_snapshot.go:91","msg":"fetched snapshot","endpoint":"https://192.168.0.222:2379","size":"12 MB","took":"now"}
+    {"level":"info","ts":1644382732.3858457,"caller":"snapshot/v3_snapshot.go:100","msg":"saved","path":"/backup/etcd-kube2.internal-2022-02-09-12-58-1644382731"}
+    Snapshot saved at /backup/etcd-kube2.internal-2022-02-09-12-58-1644382731
+
+    ```

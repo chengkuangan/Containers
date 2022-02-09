@@ -71,9 +71,8 @@ spec:
             - name: TZ
               value: "Asia/Kuala_Lumpur"
             name: ectd-backup
-            #image: chengkuan/etcd-backup:arm64-1.0.0
-            image: nexus.internal:7082/repository/containers/etcd-backup:arm64-1.0.0
-            imagePullPolicy: Always
+            image: chengkuan/etcd-backup:arm64-1.0.0
+            imagePullPolicy: IfNotPresent
             resources:
               requests:
                 cpu: 100m

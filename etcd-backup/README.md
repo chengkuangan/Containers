@@ -4,14 +4,14 @@ This container provides a simple approach to backup the `etcd` into a `Persisten
 
 The `etcd-backup` pod is deployed into Kubernetes and using the `Cronjob` to schedule the snapshot.
 
-It is currently based on Alpine base image and supports on `amd64` and `arm64` architecture. You need to build the specific container for the respective architecture. Please refer the next section.
+It is currently based on Alpine base image and supports on `amd64` and `arm64` architecture. You need to build the specific container for the respective architecture. Please refer to the next section.
 
 ## Build the Container
 
 1. Build the base image
 
     The current `etcd` version is defaulted into "v3.5.0" in the [Dockerfile.alpine](./Dockerfile.alpine). 
-    You can change the etcd version to your preferred version using `--build-arg ETCD_VERSION=v3.5.0` at the `docker build` command.
+    You can change the `etcd` version to your preferred version using `--build-arg ETCD_VERSION=v3.5.0` at the `docker build` command.
 
   ```
   # Internal insecured registry
@@ -24,7 +24,7 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
 2. Build the arm64 base image
 
     The current `kubectl` version is defaulted into "v1.22.4" in the [Dockerfile.alpine.arm64](./Dockerfile.alpine.arm64) file. 
-    You can change the etcd version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
+    You can change the `kubectl` version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
 
   ```
   # Internal insecured registry
@@ -37,7 +37,7 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
 3. Build the amd64 base image
 
     The current `kubectl` version is defaulted into "v1.22.4" in the [Dockerfile.alpine.amd64](./Dockerfile.alpine.amd64) file. 
-    You can change the etcd version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
+    You can change the `kubectl` version to your preferred version using `--build-arg KUBE_VERSION=v1.22.4` at the `docker build` command.
 
   ```
   # Internal insecured registry

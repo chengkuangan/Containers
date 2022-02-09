@@ -76,6 +76,7 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
             - name: TZ
               value: "Asia/Kuala_Lumpur"
     ```
+    Refer the timezone values at [wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
 3. The YAML also defines the location for the `etcd` POD PKI certificates and key using a `Hostpath` definition. We also define the PVC to store the snapshot file. This is also the location for the log file.
 

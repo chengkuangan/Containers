@@ -67,8 +67,8 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
     ...
     ```
     Refer the Kubernetes [Cronjob syntax](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax) for more configuration option.
-
     
+    Please note that Cronjob does not support customize timezone which is always defaulted to UTC+0:00. Refers the [reported issue here](https://github.com/kubernetes/kubernetes/issues/47202).
 
 2. Change the timezone via the YAML environmental variable. This affects the snapshot filename and the logging timestamp.
     ```yaml

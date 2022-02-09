@@ -157,3 +157,6 @@ It is currently based on Alpine base image and supports on `amd64` and `arm64` a
     Snapshot saved at /backup/etcd-kube2.internal-2022-02-09-12-58-1644382731
 
     ```
+# Reference
+
+- Refer [How to use etcdctl to Backup Kubernetes etcd Data?](https://braindose.blog/2022/02/09/etcdctl-backup-kubernetes/) for complete explanation.

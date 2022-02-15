@@ -6,6 +6,8 @@ The `etcd-backup` pod is deployed into Kubernetes and using the `Cronjob` to sch
 
 It is currently based on Alpine base image and supports on `amd64` and `arm64` architecture. You need to build the specific container for the respective architecture. Please refer to the next section.
 
+> Note: This project is created for tutorial pupose. Please refer the [etcdbk](https://github.com/chengkuangan/etcdbk) for the updated container build. 
+
 ## Build the Container
 
 1. Build the base image

@@ -6,12 +6,44 @@ rm -f "$pidfile"
 INITIATE_FILE=$MONGODATA_PATH/initiated.status
 
 mongod=(mongod --dbpath $MONGODATA_PATH --logpath $MONGODATA_PATH/mongod.log)
-mongo=( mongo --host 127.0.0.1 --port 27017 --quiet)
+mongo=( mongosh --host 127.0.0.1 --port 27017 --quiet)
+
+"${mongod[@]}" --pidfilepath $pidfile --fork --bind_ip_all --replSet rs0
 
 if [ ! -f "$INITIATE_FILE" ]; then
 
-    "${mongod[@]}"  --pidfilepath $pidfile --fork
+    #"${mongod[@]}" --pidfilepath $pidfile --fork
+    echo "Pod Name: $MY_POD_NAME, ns: $MY_POD_NAMESPACE"
+    
+    if [ ! -z "$MY_POD_NAME" ] ; then
+        HOSTNAME="${MY_POD_NAME}"
+    elif [ ! -z "$HOSTNAME" ] ; then
+        OPTS=`getopt -o h: --long hostname: -n 'parse-options' -- "$@"`
+        if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
+        echo "$OPTS"
+        eval set -- "$OPTS"
+
+        while true; do
+            case "$1" in
+            -h | --hostname )     HOSTNAME=$2;        shift; shift ;;
+            -- ) shift; break ;;
+            * ) break ;;
+            esac
+        done
+    fi
+
+    echo "Using hostname: $HOSTNAME" 
+
+mongosh localhost:27017/$MONGODB_DATABASE <<-EOF
+    rs.initiate({
+        _id: "rs0",
+        members: [ { _id: 0, host: "${HOSTNAME}:27017" } ]
+    });
+EOF
+
+    echo "Initiated replica set"
+    
     tries=30
     while true; do
         if ! { [ -s "$pidfile" ] && ps "$(< "$pidfile")" &> /dev/null; }; then
@@ -35,45 +67,58 @@ if [ ! -f "$INITIATE_FILE" ]; then
         sleep 1
     done
 
-    if ! "${mongo[@]}" admin -u $MONGODB_ADMIN_USER -p $MONGODB_ADMIN_PASSWORD --eval 'quit(0)' &> /dev/null; then
-        echo "User $MONGODB_ADMIN_USER not created. Creating now ... "
+mongosh localhost:27017/admin <<-EOF
+    db.createUser({ user: '$MONGODB_ADMIN_USER', pwd: '$MONGODB_ADMIN_PASSWORD', roles: [ { role: "userAdminAnyDatabase", db: "admin" } ] });
+EOF
+
+    #if ! "${mongo[@]}" admin -u $MONGODB_ADMIN_USER -p $MONGODB_ADMIN_PASSWORD --eval 'quit(0)' &> /dev/null; then
+        #echo "User $MONGODB_ADMIN_USER not created. Creating now ... "
+        echo "Creating users now ..."
         
-        "${mongo[@]}" admin <<-EOJS
+        "${mongo[@]}" -u $MONGODB_ADMIN_USER -p $MONGODB_ADMIN_PASSWORD admin <<-EOJS
         db = db.getSiblingDB('admin')
-            db.createUser(
-                {
-                    user: "$MONGODB_ADMIN_USER",
-                    pwd: "$MONGODB_ADMIN_PASSWORD",
-                    roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
-                }
-            )
-            db = db.getSiblingDB('$MONGODB_DATABASE')
+
+            db.runCommand({
+                createRole: "listDatabases",
+                privileges: [
+                    { resource: { cluster : true }, actions: ["listDatabases"]}
+                ],
+                roles: []
+            })
+
+            db.runCommand({
+                createRole: "readChangeStream",
+                privileges: [
+                    { resource: { db: "", collection: ""}, actions: [ "find", "changeStream" ] }
+                ],
+                roles: []
+            })
+
             db.createUser({
                 "user" : "$MONGODB_USER",
                 "pwd" : "$MONGODB_PASSWORD",
                     "roles" : [
-                        {
-                            "role" : "readWrite",
-                            "db" : "$MONGODB_DATABASE"
-                        },
-                        {
-                            "role" : "read",
-                            "db" : "local"
-                        }
+                        { role: "readWrite", db: "$MONGODB_DATABASE"},
+                        { role: "read", db: "local" },
+                        { role: "listDatabases", db: "admin" },
+                        { role: "readChangeStream", db: "admin" },
+                        { role: "read", db: "config" },
+                        { role: "read", db: "admin" }
                     ]
                 })
 EOJS
-    fi
+    # db = db.getSiblingDB('$MONGODB_DATABASE')
+    #fi
 
     "${mongod[@]}" --shutdown
 
     rm -f "$pidfile"
 
-    "${mongod[@]}" --fork --replSet rs0
+    #"${mongod[@]}" --fork --replSet rs0
     
-    "${mongo[@]}" admin -u $MONGODB_ADMIN_USER -p $MONGODB_ADMIN_PASSWORD --eval 'rs.initiate()'
+    #"${mongo[@]}" admin -u $MONGODB_ADMIN_USER -p $MONGODB_ADMIN_PASSWORD --eval 'rs.initiate()'
     
-    "${mongod[@]}" --shutdown
+    #"${mongod[@]}" --shutdown
 
     touch $INITIATE_FILE
 fi

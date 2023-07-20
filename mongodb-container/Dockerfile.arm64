@@ -22,10 +22,18 @@ ENV MONGODB_BIN ${MONGODB_HOME}/bin
 ENV PATH $MONGODB_BIN:$PATH
 ENV MONGODATA_PATH /var/lib/mongodb
 
-RUN cd /opt && wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-${MONGODB_VERSION}.tgz && \
-tar -xvzf mongodb-linux-x86_64-ubuntu2004-${MONGODB_VERSION}.tgz && \
-rm mongodb-linux-x86_64-ubuntu2004-${MONGODB_VERSION}.tgz && \
-mv mongodb-linux-x86_64-ubuntu2004-${MONGODB_VERSION} ${MONGODB_HOME}
+# download from https://www.mongodb.com/try/download/community
+#https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2004-6.0.8.tgz
+
+RUN cd /opt && wget https://fastdl.mongodb.org/linux/mongodb-linux-aarch64-ubuntu2004-${MONGODB_VERSION}.tgz && \
+tar -xvzf mongodb-linux-aarch64-ubuntu2004-${MONGODB_VERSION}.tgz && \
+rm mongodb-linux-aarch64-ubuntu2004-${MONGODB_VERSION}.tgz && \
+mv mongodb-linux-aarch64-ubuntu2004-${MONGODB_VERSION} ${MONGODB_HOME} && \
+wget https://downloads.mongodb.com/compass/mongosh-1.10.1-linux-arm64.tgz && \
+tar -xvzf mongosh-1.10.1-linux-arm64.tgz && \
+mv mongosh-1.10.1-linux-arm64/bin/mongosh ${MONGODB_BIN}/ && \
+rm mongosh-1.10.1-linux-arm64.tgz && \
+rm -rf mongosh-1.10.1-linux-arm64
 
 COPY ./startmongod.sh ${MONGODB_BIN}/startmongod.sh
 

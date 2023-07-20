@@ -11,11 +11,13 @@ Applications running using `docker compose` can connect to `kafka:9092`
 Change directory to the project root directory and run the container build command:
 
 ```
-docker build -t chengkuan/opay/kafka-2.13-2.8.0:latest .
-```
+SCALA_VERSION=2.13 && \
+KAFKA_VERSION=3.5.0 && \
+docker buildx build \
+--platform linux/amd64,linux/arm64 \
+-t chengkuan/kafka-$SCALA_VERSION-$KAFKA_VERSION:latest . \
+--push
 
-```
-podman build -t chengkuan/opay/kafka-2.13-2.8.0:latest .
 ```
 
 ## To run

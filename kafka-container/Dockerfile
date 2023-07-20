@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
-ENV KAFKA_VERSION="2.13-2.8.0"
+ARG SCALA_VERSION="2.13"
+ARG KAFKA_VERSION="2.8.0"
 ENV CONTAINER_VERSION="1.0.0"
 ENV CONTAINER_NAME="Kafka Container"
 ENV KAFKA_PATH="/opt/kafka_${KAFKA_VERSION}"
@@ -19,7 +20,7 @@ USER root:root
 
 RUN apt-get update && apt-get install -y curl default-jdk
 
-RUN cd /opt && curl -sfSL https://archive.apache.org/dist/kafka/2.8.0/kafka_${KAFKA_VERSION}.tgz | tar xz
+RUN cd /opt && curl -sfSL https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz | tar xz
 
 COPY startKafka.sh ${KAFKA_PATH}/bin/startKafka.sh
 

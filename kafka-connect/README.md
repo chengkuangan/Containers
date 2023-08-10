@@ -1,14 +1,18 @@
-# Kafka Connect Container v1.0.0
+# Kafka Connect Container
 
-Base on `quay.io/debezium/connect` and added MongoDB Kafka Connector plugin.
+This build of Kafka Connect container is for demo and development purposes. 
+
+It is base on `quay.io/debezium/connect` and the MongoDB Kafka Connector plugin is added during the build.
+
+Current [Dockerfile](/kafka-connect/Dockerfile) is using base image `quay.io/debezium/connect:2.3`
 
 ## Build the container image
 
-Change directory to the project root and run the container build command:
+Change directory to the project root and run the container build command. You change the MongoDB connector version by configuring the environmental variable `MONGODB_CONNECTOR_VERSION`.
+
+Check the list of MongoDB Connector versions at this [MongoDB Kafka Connect Repo](https://repo1.maven.org/maven2/org/mongodb/kafka/mongo-kafka-connect)
 
 ```
-export DEBEZIUM_VERSION=2.4 && \ 
-export CONTAINER_VERSION=2.4 && \
 export MONGODB_CONNECTOR_VERSION=1.9.1 && \
 docker buildx build \
 --platform linux/amd64,linux/arm64 \
@@ -18,7 +22,7 @@ docker buildx build \
 
 ## Running the container
 
-You need to have Apache Kafka running in the same network.
+You need to have Apache Kafka and MongoDB running in the same network.
 
 ## Create Connector
 

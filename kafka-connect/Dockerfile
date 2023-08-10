@@ -1,4 +1,4 @@
-FROM quay.io/debezium/connect:${DEBEZIUM_VERSION:-2.4}
+FROM quay.io/debezium/connect:2.3
 
 ARG MONGODB_CONNECTOR_VERSION=1.9.1
 

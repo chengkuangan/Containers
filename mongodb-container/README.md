@@ -1,67 +1,44 @@
 # MongoDB Container
 
-This provides a MongoDB container with cluster feature enabled. It is intended to run as one instance cluster for demo purpose. The cluster feature is required to 
-demonstrate Debezium with replicatset. 
+This MongoDB container build is used for Debezium Demo. When you starts the container for the first time, the startup script will create the necessary user and database configured via the standard environmental variables. Necessary user permissions are configured for this user. 
 
-Using command line `mongosh`.
+Once the user and database are created, a replicaset will be created.
 
-## To build the container
+Refer [Debezium Connector for MongoDB](https://debezium.io/documentation/reference/2.3/connectors/mongodb.html) for more detail of the neccesary pre-requisitions for configuring MongoDB for Debezium.
 
-In the project root directory, run the following `docker`
+This container build is using the official [MongoDB container](https://hub.docker.com/_/mongo) image as the base image.
 
-Build `amd64` base container:
+Current [Dockerfile](/mongodb-container/Dockerfile) is using `mongo:6.0.8`
+
+## Environmental Variables
+
+These are environmental variables to configure the database during startup:
+
+- `MONGODB_ADMIN_USER` - Administrator username.
+- `MONGODB_ADMIN_PASSWORD` - Administrator passwword
+- `MONGODB_USER` - Username that will be used by Debezium
+- `MONGODB_PASSWORD` - User password
+- `MONGODB_DATABASE` - Database to be created for Debezium demo.
+
+Refer [docker-compose.yaml](/mongodb-container/docker-compose.yaml) for a usage example.
+
+## To build The Container
+
+In the project root directory, run the following `docker` command
 
 ```
-
-MONGODB_VERSION=6.0.8
-docker buildx build \
---build-arg MONGODB_VERSION=${MONGODB_VERSION} \
---platform linux/amd64 \
--f Dockerfile.amd64 \
--t chengkuan/mongodb-amd64-${MONGODB_VERSION}:latest . \
+MONGODB_VERSION=6.0.8; docker buildx build \
+--platform linux/arm64,linux/amd64 \
+-t chengkuan/mongodb-arm64-${MONGODB_VERSION}:latest . \
 --push
 ```
 
-Build `arm64` base container:
+## Running the Container Locally Using Docker Compose
+
+You can run and test the container locally using the provided [docker-compose.yaml](/mongodb-container/docker-compose.yaml) file.
+
+At the project root directory:
 
 ```
-MONGODB_VERSION=6.0.8
-docker build \
---build-arg MONGODB_VERSION=${MONGODB_VERSION} \
---platform linux/arm64 \
--f Dockerfile.arm64 \
--t chengkuan/mongodb-arm64-${MONGODB_VERSION}:latest .
-
-```
-
-## Running container locally
-
-1. Create a volume mapping for `/var/lib/mongodb` and run the container.
-
-```
-docker volume rm mongo-data && \
-docker volume create mongo-data && \
-docker run --rm --name mongodb --env MONGODB_USER=audit --env MONGODB_PASSWORD=audit --env MONGODB_ADMIN_USER=admin --env MONGODB_ADMIN_PASSWORD=admin --env MONGODB_DATABASE=audit --mount source=mongo-data,target=/var/lib/mongodb -p 27017:27017 chengkuan/mongodb-arm64-6.0.8:latest
-```
-
-## Run the container in docker compose
-
-```
-  audit-mongodb:
-    image: chengkuan/opay/mongodb-arm64-6.0.8:latest
-    ports:
-     - 27017:27017
-    healthcheck:
-      test: 'mongosh localhost:27017/test --quiet'
-      interval: 2s
-      timeout: 20s
-      retries: 10
-    volumes:
-      - /var/lib/mongodb
-    environment:
-     - MONGO_INITDB_ROOT_USERNAME=audit
-     - MONGO_INITDB_ROOT_PASSWORD=audit
-     - MONGODB_ADMIN_USER=audit
-     - MONGODB_ADMIN_PASSWORD=audit
-     - MONGODB_DATABASE=audit
+docker compose up
 ```
